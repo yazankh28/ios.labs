@@ -33,11 +33,31 @@ struct ContentView: View {
         VStack(spacing: 20) {
             Text("Fråga \(currentIndex + 1) av \(questions.count)")
                 .foregroundColor(.gray)
+
             Text(questions[currentIndex].text)
                 .font(.title2)
                 .fontWeight(.semibold)
                 .multilineTextAlignment(.center)
                 .padding()
+
+            ForEach(questions[currentIndex].options, id: \.self) { option in
+                Button(action: {
+                    if selectedAnswer == nil {
+                        selectedAnswer = option
+                        if option == questions[currentIndex].correctAnswer {
+                            score += 1
+                        }
+                    }
+                }) {
+                    Text(option)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(10)
+                }
+                .foregroundColor(.primary)
+            }
+            .padding(.horizontal)
         }
     }
 }
