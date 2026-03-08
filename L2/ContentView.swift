@@ -25,13 +25,19 @@ struct ContentView: View {
                  correctAnswer: "Swift")
     ]
 
+    @State private var currentIndex = 0
+    @State private var score = 0
+    @State private var selectedAnswer: String? = nil
+
     var body: some View {
-        VStack {
-            Text("Pop Quiz")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-            Text("\(questions.count) frågor")
+        VStack(spacing: 20) {
+            Text("Fråga \(currentIndex + 1) av \(questions.count)")
                 .foregroundColor(.gray)
+            Text(questions[currentIndex].text)
+                .font(.title2)
+                .fontWeight(.semibold)
+                .multilineTextAlignment(.center)
+                .padding()
         }
     }
 }
