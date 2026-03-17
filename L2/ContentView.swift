@@ -33,23 +33,21 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 20) {
             if showResult {
-                VStack(spacing: 20) {
-                    Text("Quiz klart! 🎉")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-
+                VStack(spacing: 24) {
+                    Text(score >= 4 ? "🏆" : "😅").font(.system(size: 80))
+                    Text("Quiz klart!").font(.largeTitle).fontWeight(.bold)
                     Text("Du fick \(score) av \(questions.count) rätt")
-                        .font(.title2)
-                        .foregroundColor(.gray)
-
+                        .font(.title3).foregroundColor(.gray)
                     HStack(spacing: 20) {
                         Label("\(score) rätt", systemImage: "checkmark.circle.fill")
                             .foregroundColor(.green)
                         Label("\(questions.count - score) fel", systemImage: "xmark.circle.fill")
                             .foregroundColor(.red)
                     }
-
-                    Button("Försök igen") {
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+                    Button("Spela igen") {
                         currentIndex = 0
                         score = 0
                         selectedAnswer = nil
@@ -61,51 +59,21 @@ struct ContentView: View {
                     .cornerRadius(10)
                 }
             } else {
-                Text("Fråga \(currentIndex + 1) av \(questions.count)")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-                    .padding(.top, 40)
-
-                Text(questions[currentIndex].text)
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .multilineTextAlignment(.center)
-                    .padding()
-
-                ForEach(questions[currentIndex].options, id: \.self) { option in
-                    Button(action: {
+                QuestionView(
+                    question: questions[currentIndex],
+                    shuffledAnswers: questions[currentIndex].options,
+                    currentIndex: currentIndex,
+                    totalQuestions: questions.count,
+                    selectedAnswer: selectedAnswer,
+                    onSelect: { answer in
                         if selectedAnswer == nil {
-                            selectedAnswer = option
-                            if option == questions[currentIndex].correctAnswer {
+                            selectedAnswer = answer
+                            if answer == questions[currentIndex].correctAnswer {
                                 score += 1
                             }
                         }
-                    }) {
-                        HStack {
-                            Text(option)
-                            Spacer()
-                            if let selected = selectedAnswer {
-                                if option == questions[currentIndex].correctAnswer {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
-                                } else if option == selected {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(.red)
-                                }
-                            }
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(buttonColor(for: option))
-                        .cornerRadius(10)
-                    }
-                    .foregroundColor(.primary)
-                    .disabled(selectedAnswer != nil)
-                }
-                .padding(.horizontal)
-
-                if selectedAnswer != nil {
-                    Button(currentIndex + 1 == questions.count ? "Se resultat" : "Nästa fråga") {
+                    },
+                    onNext: {
                         if currentIndex + 1 < questions.count {
                             currentIndex += 1
                             selectedAnswer = nil
@@ -113,24 +81,8 @@ struct ContentView: View {
                             showResult = true
                         }
                     }
-                    .padding()
-                    .background(Color.purple)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                }
+                )
             }
         }
-    }
-
-    func buttonColor(for option: String) -> Color {
-        guard let selected = selectedAnswer else {
-            return Color(.systemGray6)
-        }
-        if option == questions[currentIndex].correctAnswer {
-            return Color.green.opacity(0.2)
-        } else if option == selected {
-            return Color.red.opacity(0.2)
-        }
-        return Color(.systemGray6)
     }
 }
